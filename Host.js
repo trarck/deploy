@@ -99,12 +99,12 @@ var Host = BaseObject.extend({
      */
     execCommand:function (command) {
         this._conn.exec(this.getCommand(command));
+//        command.exec(this._conn);
     },
 
-    getCommand:function (action) {
-        if (typeof action == "string") return action;
-        if (action.getCommand) return action.getCommand();
-        if (action.cmd) return action.cmd;
+    getCommand:function (command) {
+        if (typeof command == "string") return command;
+        if (command.getExecString) return command.getExecString(this._conn);
     },
 
     /**

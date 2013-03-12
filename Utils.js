@@ -1,3 +1,5 @@
+var fs=require('fs');
+
 var metaKeyCodeRe = /(\x1b)([a-zA-Z0-9])/g;
 var functionKeyCodeRe =
     /(?:\x1b+)(O|N|\[|\[\[)(?:(\d+)(?:;(\d+))?(([~^$])|(?:1;)?(\d+)?[a-zA-Z]))/g;
@@ -88,4 +90,26 @@ exports.mixin= function(){
 
     // Pass it back
     return target;
+};
+
+exports.getFilesContent=function(files){
+    var content="";
+    if(typeof files=="object"){
+        for(var f in files){
+            content+=fs.readFileSync(files[f]).toString()+"\n";
+        }
+    }else{
+        content=fs.readFileSync(files).toString();
+    }
+    return content;
+};
+
+exports.getObjectValues=function(obj){
+    var values=[];
+    for(var k in obj){
+        if(obj.hasOwnProperty(k)){
+            values.push(obj[k]);
+        }
+    }
+    return values;
 };
