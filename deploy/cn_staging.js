@@ -4,7 +4,7 @@
  * 版本2(引用执行):Command的每条指令为一个对象，当执行时，调用Command的exec方法。
  */
 var Command=require('../Command');
-
+var CommandOut=require('../CommandOut');
 /**
  * action=[command,command]
  */
@@ -15,20 +15,22 @@ var config={
     apps:["mgsys@cgwdev22","mgsys@cgwdev09"],//,"root@119.15.138.4"
     dbs:[],
 
+    shell:false,//use command
+
     tasks:[
         {
             name:"exit",
             //default is shell command
-            action:"exit"
+            action:[Command.run("exit")]
         },
         {
             name:"init",
             //default is shell command
-            action:function(){
-                var cmdOut=new Command.CommandOut;
+            action:function(context,options){
+                var cmdOut=new CommandOut;
                 cmdOut.run("cd test");
                 cmdOut.run("ls");
-                return cmdOut.getOut();
+                return cmdOut.getOut(context,options);
             }
         },
         {
@@ -36,10 +38,10 @@ var config={
 
             action:[
                 Command.runJSFile("./scripts/t.js"),
-                function(context){
-                    var cmdOut=new Command.CommandOut;
+                function(context,options){
+                    var cmdOut=new CommandOut;
                     cmdOut.runTask("exit");
-                    return cmdOut.getOut(context);
+                    return cmdOut.getOut(context,options);
                 }
             ],
             role:"app"

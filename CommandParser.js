@@ -1,40 +1,64 @@
-var fs=require('fs');
+var yhnode=require('yhnode');
 var CommandType=require('./CommandType');
+var Utils = require('./Utils');
+var Command=require('./Command');
 
-exports.parseCommand=function(cmd,context){
+exports.parseCommand=function(cmd,context,options){
     var ret=[];
+    var conf=yhnode.base.Core.mixin({},options);
     switch(typeof cmd){
         case 'object':
             switch(cmd.type){
+                case CommandType.Command://shell string
+                    conf.value=cmd.value;
+                    ret.push(new Command(conf));
+                    break;
+                case CommandType.CommandFile://shell file
+                    conf.value=Utils.getFilesContent(cmd.file);
+                    ret.push(new Command(conf));
+                    break;
                 case CommandType.ShellString://shell string
-                    ret.push(cmd.value);
+                    conf.value=cmd.value;
+                    ret.push(new Command.CommandShell(conf));
                     break;
                 case CommandType.ShellFile://shell file
-                    ret.push(getScriptFilesContent(cmd.file));
+                    conf.value=Utils.getFilesContent(cmd.file);
+                    ret.push(new Command.CommandShell(conf));
                     break;
                 case CommandType.JavaScriptString://js string
-                    //不需要转义脚本中的引号，node会自动处理。
-                    ret.push('node -e "'+cmd.value+'"');
+                    conf.value=cmd.value;
+                    ret.push(new Command.CommandJavaScript(conf));
                     break;
                 case CommandType.JavaScriptFile://js file
-                    var cmdContent=getScriptFilesContent(cmd.file);
-                    //不需要转义脚本中的引号，node会自动处理。
-                    ret.push('node -e "'+cmdContent+'"');
+                    conf.value=Utils.getFilesContent(cmd.file);
+                    ret.push(new Command.CommandJavaScript(conf));
                     break;
                 case CommandType.Task:
-                    var taskDefine=context[cmd.name];
-                    if(!taskDefine)
+                    var task=context.getTask(cmd.name);
+                    if(!task)
                         throw new Error("dependence task["+cmd.name+"] is not defined");
-                    ret=ret.concat(taskDefine.action||taskDefine.getAction());
+                    conf.task=task;
+                    ret.push(new Command.CommandTask(conf));
                     break;
-
+                case CommandType.Sudo:
+                    conf.value=cmd.value;
+                    ret.push(new Command.Sudo(conf));
+                    break;
+                case CommandType.SudoWrap:
+                    if(typeof cmd.cmd=="object"){
+                        conf.value=exports.parseCommand(cmd.cmd,context,options);
+                    }else{
+                        conf.value=cmd.cmd;
+                    }
+                    ret.push(new Command.SudoWrap(conf));
+                    break;
                 default:
 
                     break;
             }
             break;
         case 'function':
-            var result=cmd(context);
+            var result=cmd(context,options);
             if(result){
                 if(result instanceof Array){
                     ret=ret.concat(result);
@@ -47,22 +71,22 @@ exports.parseCommand=function(cmd,context){
             ret.push(cmd);
             break;
         default:
-            throw "unkown command type";
+            throw "unkown command type "+cmd;
             break;
     }
     return ret;
 };
 
-exports.parseAction=function(action,context){
+exports.parseAction=function(action,context,options){
     var ret=[];
     switch(typeof action){
         case 'object':
             for(var i in action){
-                ret=ret.concat(exports.parseCommand(action[i],context));
+                ret=ret.concat(exports.parseCommand(action[i],context,options));
             }
             break;
         case 'function':
-            var result=action(context);
+            var result=action(context,options);
             if(result){
                 if(result instanceof Array){
                     ret=ret.concat(result);
@@ -81,23 +105,3 @@ exports.parseAction=function(action,context){
 
     return ret;
 };
-
-exports.parseDefine=function(define){
-    var ret={};
-    for(var i in define){
-        ret[i]=exports.parseAction(define[i]);
-    }
-    return ret;
-};
-
-function getScriptFilesContent(files){
-    var content="";
-    if(typeof files=="object"){
-        for(var f in files){
-            content+=fs.readFileSync(files[f]).toString()+"\n";
-        }
-    }else{
-        content=fs.readFileSync(files).toString();
-    }
-    return content;
-}

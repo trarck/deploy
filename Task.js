@@ -2,10 +2,8 @@ var yhnode=require('yhnode');
 
 var Task=yhnode.base.BaseObject.extend({
 
-    initialize:function(conf){
-        conf.name && this.setName(conf.name);
-        conf.role && this.setRole(conf.role);
-        conf.action && this.setAction(conf.action);
+    initialize:function(){
+
     },
 
     setName:function(name) {
@@ -33,7 +31,35 @@ var Task=yhnode.base.BaseObject.extend({
 
     getRole:function() {
         return this._role;
+    },
+
+    setManager:function(manager) {
+        this._manager = manager;
+        return this;
+    },
+
+    getManager:function() {
+        return this._manager;
+    },
+
+    setHosts:function(hosts) {
+        this._hosts = hosts;
+        return this;
+    },
+
+    getHosts:function() {
+        return this._hosts;
+    },
+
+    run:function(){
+        var hosts=this._hosts;
+        var host;
+        for(var k in hosts){
+            host=hosts[k];
+            host.initAction(this._action);
+            host.execNextCommand();
+        }
     }
-});
+},null,yhnode.base.Accessor);
 
 module.exports=Task;

@@ -52,7 +52,12 @@ var Deploy=BaseObject.extend({
     },
 
     initTasks:function(){
-        this._tasks=TaskManager.parse(this._config.tasks);
+        var options={
+            env:this._config.env,
+            shell:this._config.shell
+        };
+        this._taskManager=new TaskManager(this);
+        this._tasks= this._taskManager.parse(this._config.tasks,options);
     },
 
     createApp:function(appConf){
@@ -106,11 +111,27 @@ var Deploy=BaseObject.extend({
         return connectionConf;
     },
 
+    getHosts:function(role){
+        switch(role){
+            case "app":
+                return this._apps;
+                break;
+            case "db":
+                return this._dbs;
+                break;
+            case "all":
+            default:
+                return this._hosts;
+                break;
+        }
+        return null;
+    },
+
     runTask:function(taskName){
 
         console.log("runTask:"+taskName);
 
-        this._runningTask=this._tasks[taskName];
+        this._runningTask=this._taskManager.getTask(taskName);
         if(!this._runningTask)
             throw new Error("no task fined named "+taskName);
 
@@ -118,13 +139,7 @@ var Deploy=BaseObject.extend({
 
         switch(this._runningTask.getRole()){
             case "app":
-                var appHost;
-                for(var hostName in this._apps){
-                    this._hostsRunningStatus[hostName]=false;
-                    appHost=this._apps[hostName];
-                    appHost.initAction(this._runningTask.getAction());
-                    appHost.execNextCommand();
-                }
+                this._runningTask.run(Utils.getObjectValues(this._apps));
                 break;
             case "db":
                 var dbHost;
