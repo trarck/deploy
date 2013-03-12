@@ -1,0 +1,12 @@
+{
+  "name": "deploy",
+
+   "version": "0.0.1",
+   "main": "app.js",
+  "dependencies": {
+	  "yhnode":"*"
+  },
+  "devDependencies": {
+    
+  }
+}

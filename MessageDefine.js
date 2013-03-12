@@ -1,0 +1,12 @@
+module.exports={
+    Login:"login",
+    Logout:'logout',
+    GatewayLogin:"gatewayLogin",
+    Data:"data",
+    ExecAllComplete:"execAllComplete",
+    ExecActionComplete:"execActionComplete",
+    Drain:"drain",
+    CommandIdle:'commandIdle',
+    TaskONRunningHostsComplete:"taskONRunningHostsComplete",
+    Error:"error"
+};

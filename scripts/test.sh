@@ -1,0 +1,2 @@
+cd ~/PorscheServer
+git status
