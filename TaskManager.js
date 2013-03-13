@@ -18,6 +18,7 @@ var TaskManager=module.exports=yhnode.base.Core.Class([yhnode.base.BaseObject,ev
             conf.action=CommandParser.parseAction(conf.action,this,options);
             console.log(conf.action);
             conf.manager=this;
+            //TODO 如果host没有建立好，些时没办法获取hosts.可以放在task.run方法里动态从deploy里获取。
             conf.hosts=this._deploy.getHosts(conf.role);
             task=new Task();
             task.setAttributes(conf);

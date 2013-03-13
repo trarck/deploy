@@ -1,6 +1,8 @@
 var yhnode=require('yhnode');
+var BaseObject=require('./BaseObject');
+var MessageDefine = require('./MessageDefine');
 
-var Task=yhnode.base.BaseObject.extend({
+var Task=BaseObject.extend({
 
     initialize:function(){
 
@@ -52,14 +54,55 @@ var Task=yhnode.base.BaseObject.extend({
     },
 
     run:function(){
+        this._hostsRunningStatus={};
         var hosts=this._hosts;
         var host;
         for(var k in hosts){
             host=hosts[k];
-            host.initAction(this._action);
-            host.execNextCommand();
+            this.runAction(host);
         }
+    },
+
+    runAction:function(host){
+        var self=this;
+        this._hostsRunningStatus[host.getName()]=false;
+
+        var onComplete=function(host){
+            host.removeListener(MessageDefine.ExecAllComplete,onComplete);
+            self._hostsRunningStatus[host.getName()]=true;
+            self._checkTaskOnHostsComplete(host);
+        };
+
+        host.on(MessageDefine.ExecAllComplete,onComplete);
+
+        host.initAction(this._action);
+
+        if(host.isActive()){
+            if(host.isLogin()){
+                host.execNextCommand();
+            }else{
+                host.on(MessageDefine.Login,function(){
+                    host.execNextCommand();
+                });
+            }
+        }else{
+            host.connect();
+            host.on(MessageDefine.Login,function(){
+                host.execNextCommand();
+            });
+        }
+    },
+
+    _checkTaskOnHostsComplete:function(){
+        for(var appName in this._hostsRunningStatus){
+            if(!this._hostsRunningStatus[appName]){
+                return false;
+            }
+        }
+        this.emit(MessageDefine.TaskComplete);
+        return true;
     }
+
 },null,yhnode.base.Accessor);
 
 module.exports=Task;

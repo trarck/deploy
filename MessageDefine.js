@@ -7,6 +7,6 @@ module.exports={
     ExecActionComplete:"execActionComplete",
     Drain:"drain",
     CommandIdle:'commandIdle',
-    TaskONRunningHostsComplete:"taskONRunningHostsComplete",
+    TaskComplete:"taskONRunningHostsComplete",
     Error:"error"
 };
