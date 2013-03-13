@@ -8,4 +8,8 @@ module.exports={
     Task:7,
     Sudo:8,
     SudoWrap:9
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> master

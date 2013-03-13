@@ -170,7 +170,7 @@ var Deploy=BaseObject.extend({
 //                return false;
 //            }
 //        }
-//        this.emit(MessageDefine.TaskONRunningHostsComplete);
+//        this.emit(MessageDefine.TaskComplete);
 //        return true;
 //    },
     /**

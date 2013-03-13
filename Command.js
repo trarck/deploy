@@ -2,6 +2,7 @@ var yhnode = require('yhnode');
 var CommandType = require('./CommandType');
 
 var Command = yhnode.base.Core.Class({
+
     overrides:{
 
         initialize:function (config) {
