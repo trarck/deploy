@@ -17,7 +17,6 @@ var TaskManager=module.exports=yhnode.base.Core.Class([yhnode.base.BaseObject,ev
 
             conf.manager=this;
             conf.hosts=this._deploy.getHosts(conf.role);
-            this._contextHosts=conf.hosts;
             conf.action=CommandParser.parseAction(conf.action,this,options);
             console.log(conf.action);
 
