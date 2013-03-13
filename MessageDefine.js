@@ -4,7 +4,7 @@ module.exports={
     GatewayLogin:"gatewayLogin",
     Data:"data",
     ExecActionComplete:"execActionComplete",
-    ExecCommandComplete:"execCommadComplete",
+    ExecCommandComplete:"execCommandComplete",
     Drain:"drain",
     CommandIdle:'commandIdle',
     TaskComplete:"taskComplete",
