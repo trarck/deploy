@@ -1,3 +1,4 @@
+var yhnode=require('yhnode');
 var BaseObject = require('./BaseObject');
 var Connection = require('./ConnectionGateway');
 var MessageDefine = require('./MessageDefine');
@@ -130,13 +131,19 @@ var Host = BaseObject.extend({
 //    console.log("this._commandIndex>=this._action.length",this._commandIndex,this._action.length);
         if (this._commandIndex >= this._action.length) {
             console.log(this._conn.host + " :ExecActionComplete");
-            this.emit(MessageDefine.ExecActionComplete, this);
+            this.emit(MessageDefine.ExecActionComplete, this,this._actionName);
         }
     },
 
-    initAction:function (actions) {
-        this._action = actions;
+    /**
+     * action name == task name
+     * @param actions
+     * @param actionName
+     */
+    initAction:function (actions,actionName) {
+        this._action = yhnode.base.Core.clone(actions);
         this._commandIndex = 0;
+        this._actionName=actionName;
         return this;
     },
 
@@ -159,6 +166,14 @@ var Host = BaseObject.extend({
     setAction:function (action) {
         this._action = action;
         return this;
+    },
+
+    setActionName:function(actionName) {
+        this._actionName = actionName;
+        return this;
+    },
+    getActionName:function() {
+        return this._actionName;
     },
 
     setCommandIndex:function (commandIndex) {
