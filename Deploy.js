@@ -67,9 +67,9 @@ var Deploy=BaseObject.extend({
         var connConfig=this.createConnectionConfig(appConf);
         app.setup(connConfig);
         app.connect();
-        app.on(MessageDefine.ExecAllComplete,function(host){
-            self.onTaskComplete(host);
-        });
+//        app.on(MessageDefine.ExecAllComplete,function(host){
+//            self.onTaskComplete(host);
+//        });
 
         this._hosts.push(app);
         this._apps[app.getName()]=app;
@@ -82,9 +82,9 @@ var Deploy=BaseObject.extend({
         var connConfig=this.createConnectionConfig(appConf);
         db.setup(connConfig);
         db.connect();
-        db.on(MessageDefine.ExecAllComplete,function(host){
-            self.onTaskComplete(host);
-        });
+//        db.on(MessageDefine.ExecAllComplete,function(host){
+//            self.onTaskComplete(host);
+//        });
 
         this._hosts.push(db);
         this._dbs[db.getName()]=db;
@@ -135,45 +135,21 @@ var Deploy=BaseObject.extend({
         if(!this._runningTask)
             throw new Error("no task fined named "+taskName);
 
-        this._hostsRunningStatus={};
+//        this._hostsRunningStatus={};
 
-        switch(this._runningTask.getRole()){
-            case "app":
-                var appHost;
-                for(var hostName in this._apps){
-                    this._hostsRunningStatus[hostName]=false;
-                    appHost=this._apps[hostName];
-                    appHost.initAction(this._runningTask.getAction());
-                    appHost.execNextCommand();
-                }
-                break;
-            case "db":
-                var dbHost;
-                for(var hostName in this._apps){
-                    this._hostsRunningStatus[hostName]=false;
-                    dbHost=this._apps[hostName];
-                    dbHost.initAction(this._runningTask.getAction());
-                    dbHost.execNextCommand();
-                }
-                break;
-            case "all":
-            default:
-                var host;
-                for(var i in this._hosts){
-                    host=this._hosts[i];
-                    this._hostsRunningStatus[host.getName()]=false;
-                    host.initAction(this._runningTask.getAction());
-                    host.execNextCommand();
-                }
-                break;
-        }
+        var self=this;
+        this._runningTask.on(MessageDefine.TaskComplete,function(){
+            self.emit(MessageDefine.TaskComplete);
+        });
+
+        this._runningTask.run();
     },
 
     runTasks:function(taskNames){
         var self=this;
         var currentIndex=0;
         this.runTask(taskNames[currentIndex++]);
-        this.on(MessageDefine.TaskONRunningHostsComplete,function(){
+        this.on(MessageDefine.TaskComplete,function(){
             if(currentIndex<taskNames.length ){
                 self.runTask(taskNames[currentIndex++]);
             } else{
@@ -183,20 +159,20 @@ var Deploy=BaseObject.extend({
         });
     },
 
-    onTaskComplete:function(host){
-        this._hostsRunningStatus[host.getName()]=true;
-        this._checkTaskOnAllRunningHostsComplete();
-    },
-
-    _checkTaskOnAllRunningHostsComplete:function(){
-        for(var appName in this._hostsRunningStatus){
-            if(!this._hostsRunningStatus[appName]){
-                return false;
-            }
-        }
-        this.emit(MessageDefine.TaskONRunningHostsComplete);
-        return true;
-    },
+//    onTaskComplete:function(host){
+//        this._hostsRunningStatus[host.getName()]=true;
+//        this._checkTaskOnAllRunningHostsComplete();
+//    },
+//
+//    _checkTaskOnAllRunningHostsComplete:function(){
+//        for(var appName in this._hostsRunningStatus){
+//            if(!this._hostsRunningStatus[appName]){
+//                return false;
+//            }
+//        }
+//        this.emit(MessageDefine.TaskComplete);
+//        return true;
+//    },
     /**
      *
      * @param conf app config
