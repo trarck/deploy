@@ -44,7 +44,7 @@ var Host = BaseObject.extend({
         });
 
         if (this._waitForActionComplete) {
-            this.on(MessageDefine.ExecActionComplete, function (action) {
+            this.on(MessageDefine.ExecCommandComplete, function (action) {
                 if (self._logined) {
 //                ++self._commandIndex;
                     self.execNextCommand();
@@ -117,20 +117,20 @@ var Host = BaseObject.extend({
         if (this._checkTimer) clearTimeout(this._checkTimer);
         this._checkTimer = setTimeout(function () {
             self.checkActionFinish();
-            //由于在checkActionFinish中触发了ExecActionComplete事件，会引起执行下个动作，所以先检查ExecAllComplete事件。
+            //由于在checkActionFinish中触发了ExecCommandComplete事件，会引起执行下个动作，所以先检查ExecActionComplete事件。
             self.checkCommandFinish();
         }, this._checkDelay);
     },
 
     checkCommandFinish:function () {
-        this.emit(MessageDefine.ExecActionComplete, this._action[this._commandIndex]);
+        this.emit(MessageDefine.ExecCommandComplete, this._action[this._commandIndex]);
     },
 
     checkActionFinish:function () {
 //    console.log("this._commandIndex>=this._action.length",this._commandIndex,this._action.length);
         if (this._commandIndex >= this._action.length) {
-            console.log(this._conn.host + " :ExecAllComplete");
-            this.emit(MessageDefine.ExecAllComplete, this);
+            console.log(this._conn.host + " :ExecActionComplete");
+            this.emit(MessageDefine.ExecActionComplete, this);
         }
     },
 

@@ -67,7 +67,7 @@ var Deploy=BaseObject.extend({
         var connConfig=this.createConnectionConfig(appConf);
         app.setup(connConfig);
         app.connect();
-//        app.on(MessageDefine.ExecAllComplete,function(host){
+//        app.on(MessageDefine.ExecActionComplete,function(host){
 //            self.onTaskComplete(host);
 //        });
 
@@ -82,7 +82,7 @@ var Deploy=BaseObject.extend({
         var connConfig=this.createConnectionConfig(appConf);
         db.setup(connConfig);
         db.connect();
-//        db.on(MessageDefine.ExecAllComplete,function(host){
+//        db.on(MessageDefine.ExecActionComplete,function(host){
 //            self.onTaskComplete(host);
 //        });
 

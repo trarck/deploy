@@ -68,12 +68,12 @@ var Task=BaseObject.extend({
         this._hostsRunningStatus[host.getName()]=false;
 
         var onComplete=function(host){
-            host.removeListener(MessageDefine.ExecAllComplete,onComplete);
+            host.removeListener(MessageDefine.ExecActionComplete,onComplete);
             self._hostsRunningStatus[host.getName()]=true;
             self._checkTaskOnHostsComplete(host);
         };
 
-        host.on(MessageDefine.ExecAllComplete,onComplete);
+        host.on(MessageDefine.ExecActionComplete,onComplete);
 
         host.initAction(this._action);
 

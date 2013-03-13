@@ -11,7 +11,7 @@ var TaskHost=yhnode.base.Core.Class(Host,{
 
     setup:function(){
         TaskHost._super_.setup.apply(this,arguments);
-        this.on(MessageDefine.ExecActionComplete,function(action){
+        this.on(MessageDefine.ExecCommandComplete,function(action){
 
         });
     },
