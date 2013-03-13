@@ -7,8 +7,8 @@
  *             解决办法：被调用的任务只作用在当前调用任务的那个host上，不作用其它host.其它host上被调用的任务会被其它调用的任务调用。
 * 这里使用版本2。
  */
-var Command=require('../Command');
-var CommandOut=require('../CommandOut');
+var Command=require('../index').Command;
+var CommandOut=require('../index').CommandOut;
 /**
  * action=[command,command]
  */
