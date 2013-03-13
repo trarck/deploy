@@ -40,10 +40,7 @@ var Host = BaseObject.extend({
         var conn = this._conn;
 
         conn.on(MessageDefine.Login, function () {
-            console.log("login");
-            self._logined = true;
-            //run app action
-            self.execNextCommand();
+            self.onLogin();
         });
 
         if (this._waitForActionComplete) {
@@ -103,8 +100,13 @@ var Host = BaseObject.extend({
     },
 
     getCommand:function (command) {
-        if (typeof command == "string") return command;
+        if (typeof command == "string") return this.replacePlaceHodlders(command);
         if (command.getExecString) return command.getExecString(this._conn);
+    },
+
+    replacePlaceHodlders:function (cmd, conn) {
+        var hodlerRegex=/#\{HOST\}/g;
+        return hodlerRegex.test(cmd)?cmd.replace(hodlerRegex, conn.getHost()):cmd;
     },
 
     /**
@@ -136,6 +138,14 @@ var Host = BaseObject.extend({
         this._action = actions;
         this._commandIndex = 0;
         return this;
+    },
+
+    onLogin:function(){
+        console.log("login");
+        this._logined = true;
+        this.emit(MessageDefine.Login,this);
+        //run app action
+//        this.execNextCommand();
     },
 
     getType:function () {
@@ -176,7 +186,20 @@ var Host = BaseObject.extend({
 
     getName:function() {
         return this._name||(this._conn && this._conn.getHost());
+    },
+
+    isLogin:function(){
+        return this._logined;
+    },
+
+    isIdle:function(){
+        return this._action==null || this._commandIndex>=this._action.length;
+    },
+
+    isActive:function () {
+        return this._conn && this._conn.isConnected();
     }
+
 
 });
 
