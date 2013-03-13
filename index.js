@@ -2,8 +2,6 @@ var fs=require('fs');
 var path=require('path');
 var yhnode=require('yhnode');
 var Deploy=require('./Deploy');
-var CommandParser=require("./CommandParser");
-var TaskManager=require('./TaskManager');
 
 var opts = [
     {
@@ -41,9 +39,7 @@ if (options.help != null || cmds.length<2) {
 
     var stageConfig=require(stageFile);
 
-    if(typeof stageConfig.log=="string"){
-        stageConfig.log=initLog(stageConfig.log);
-    }
+    initLog(stageConfig.log);
 
     var deploy=new Deploy(stageConfig);
     deploy.initHosts();
@@ -64,16 +60,23 @@ function showUsage() {
 
 var logOut;
 
-function initLog(logFile){
-    logOut=fs.openSync(logFile,'a+');
-    return log;
+function initLog(log){
+    if(log){
+        if(typeof log=="string"){
+            logOut=fs.openSync(log,'a+');
+            global.DLog=fileLog;
+        }else if(typeof log=="function"){
+            global.DLog=log;
+        }
+    }else{
+        global.DLog=console.log;
+    }
 }
 
 
-function log(){
+function fileLog(){
     console.log.apply(console,arguments);
     var msg=Array.prototype.join.call(arguments," ");
-
 //    msg=Utils.clearEscape(msg);
     msg+="\n";
     msg=(new Date()).getTime()+" "+msg;

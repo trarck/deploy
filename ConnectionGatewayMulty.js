@@ -36,7 +36,6 @@ var ConnectionGatewayMulty=Connection.extend({
         var self=this;
         this.on(MessageDefine.GatewayLogin,function(){
             self._loginedGatewayIndex++;
-            console.log("loginToHost:",self._loginedGatewayIndex)
             if(self._loginedGatewayIndex<self.gateway.length){
                 var gateway=self.gateway[this._loginedGatewayIndex];
                 gateway && self.exec("ssh -t -t "+gateway);
