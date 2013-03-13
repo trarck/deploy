@@ -33,8 +33,7 @@ var Connection=BaseObject.extend({
     close:function(options){
         if(this._isConnected && this._ssh){
             this._ssh.kill();
-            this._cleanup();
-            this._isConnected=false;
+            this._close();
         }
     },
 
@@ -62,18 +61,25 @@ var Connection=BaseObject.extend({
         }
     },
 
+    _close:function(){
+        this._cleanup();
+        this._isConnected=false;
+    },
+
     _initEvent:function(){
 
         var self=this;
         var ssh=this._ssh;
 
         ssh.on('exit',function(code,signal){
+            self._log("exit:",code,signal);
             self.emit("exit",code,signal);
         });
 
         ssh.on('close',function(){
+            self._log("close:");
             self.emit("close");
-            self._cleanup();
+            self._close();
         });
 
         ssh.on('disconnect',function(){
