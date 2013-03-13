@@ -68,7 +68,6 @@ var Task=BaseObject.extend({
         this._hostsRunningStatus[host.getName()]=false;
 
         var onComplete=function(host,name){
-            console.log("onComplete1:",name,self._name);
             if(self._name==name){
                 host.removeListener(MessageDefine.ExecActionComplete,onComplete);
                 self._hostsRunningStatus[host.getName()]=true;
@@ -79,20 +78,17 @@ var Task=BaseObject.extend({
         host.on(MessageDefine.ExecActionComplete,onComplete);
 
         host.initAction(this._action,this._name);
-console.log(host.getName()+" isAcitve:"+host.isActive(),host.isLogin())
         if(host.isActive()){
             if(host.isLogin()){
                 host.execNextCommand();
             }else{
                 host.on(MessageDefine.Login,function(){
-                    console.log("login1:")
                     host.execNextCommand();
                 });
             }
         }else{
             host.connect();
             host.on(MessageDefine.Login,function(){
-                console.log("login2:")
                 host.execNextCommand();
             });
         }
@@ -105,23 +101,18 @@ console.log(host.getName()+" isAcitve:"+host.isActive(),host.isLogin())
                 return false;
             }
         }
-        console.log("_checkTaskOnHostsComplete:true");
         this.emit(MessageDefine.TaskComplete);
         return true;
     },
 
     continueRunActionOnHost:function(host){
-        console.log("continueRunActionOnHost:"+this._name);
         var self=this;
 
         host.save();
 
         host.initAction(this._action,this._name);
 
-        console.log("after initAction:"+host._actionName);
-
         var onComplete=function(host,name){
-            console.log("onComplete2:",name,self._name);
             if(self._name==name){
                 host.removeListener(MessageDefine.ExecActionComplete,onComplete);
                 host.restore();

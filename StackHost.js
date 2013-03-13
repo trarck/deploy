@@ -17,7 +17,7 @@ var StackHost = module.exports =Host.extend({
 
     save:function(){
         //if host do nothing don't push
-        console.log("save:",!this.isIdle());
+//        console.log("save:",!this.isIdle());
 //        if(!this.isIdle()){
             this._stack.push({
                 commandIndex:this._commandIndex,
@@ -29,7 +29,7 @@ var StackHost = module.exports =Host.extend({
     },
 
     restore:function(){
-        console.log("restore:",this._stack.length);
+//        console.log("restore:",this._stack.length);
         if(this._stack.length){
             var it=this._stack.pop();
             this._commandIndex=it.commandIndex;

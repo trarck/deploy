@@ -129,7 +129,7 @@ var Host = BaseObject.extend({
     },
 
     checkActionFinish:function () {
-    console.log("checkActionFinish:",this._commandIndex,this._action.length,this._actionName);
+//    console.log("checkActionFinish:",this._commandIndex,this._action.length,this._actionName);
         if (this._commandIndex >= this._action.length) {
             console.log(this._conn.host + " :ExecActionComplete");
             this.emit(MessageDefine.ExecActionComplete, this,this._actionName);

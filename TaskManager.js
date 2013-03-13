@@ -6,7 +6,6 @@ var Task=require('./Task');
 var TaskManager=module.exports=yhnode.base.Core.Class([yhnode.base.BaseObject,events.EventEmitter],{
 
     initialize:function(deploy){
-        console.log("init");
         this._tasks={};
         this._deploy=deploy;
     },
