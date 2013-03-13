@@ -75,7 +75,7 @@ var Task=BaseObject.extend({
 
         host.on(MessageDefine.ExecActionComplete,onComplete);
 
-        host.initAction(this._action);
+        host.initAction(this._action,this._name);
 
         if(host.isActive()){
             if(host.isLogin()){
