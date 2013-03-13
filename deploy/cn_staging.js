@@ -5,8 +5,8 @@
  * 版本2(引用执行):在处理阶段生成Command对象，当执行时，调用Command的exec方法。
  * 这里使用版本1。
  */
-var Command=require('../Command');
-var CommandOut=require('../CommandOut');
+var Command=require('../lib/Command');
+var CommandOut=require('../lib/CommandOut');
 
 /**
  * action=[command,command]

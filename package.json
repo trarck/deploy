@@ -1,12 +1,15 @@
 {
-  "name": "deploy",
+    "name":"njdeploy",
+    "version":"0.0.1",
+    "author":"trarck@gmail.com",
+    "main":"index.js",
+    "bin": {
+        "njDeploy": "./bin/njDeploy"
+    },
+    "dependencies":{
+        "yhnode":"*"
+    },
+    "devDependencies":{
 
-   "version": "0.0.1",
-   "main": "app.js",
-  "dependencies": {
-	  "yhnode":"*"
-  },
-  "devDependencies": {
-    
-  }
+    }
 }
