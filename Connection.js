@@ -11,7 +11,6 @@ var Connection=BaseObject.extend({
 
         this.host=config.host;
         this._parser=new Parser(this);
-        this._log=config.log;
 
         this._isConnected=false;
     },
@@ -72,12 +71,12 @@ var Connection=BaseObject.extend({
         var ssh=this._ssh;
 
         ssh.on('exit',function(code,signal){
-            self._log("exit:",code,signal);
+            DLog("exit:",code,signal);
             self.emit("exit",code,signal);
         });
 
         ssh.on('close',function(){
-            self._log("close:");
+            DLog("close:");
             self.emit("close");
             self._close();
         });
@@ -87,7 +86,7 @@ var Connection=BaseObject.extend({
         });
 
         ssh.stdout.on('data', function (data) {
-            self._log("stdout[data]",data.toString());
+            DLog("data:",data.toString());
             self.emit("data",data);
         });
 
@@ -108,7 +107,7 @@ var Connection=BaseObject.extend({
         });
 
         ssh.stderr.on('data', function (data) {
-            self._log("stderr[data]",data.toString());
+            DLog("error:",data.toString());
             self.emit("error",data);
         });
 
