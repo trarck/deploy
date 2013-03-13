@@ -1,5 +1,5 @@
 {
-    "name":"deploy",
+    "name":"njdeploy",
     "version":"0.0.1",
     "author":"trarck@gmail.com",
     "main":"index.js",
