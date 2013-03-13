@@ -1,6 +1,8 @@
 var yhnode=require('yhnode');
+var BaseObject=require('./BaseObject');
+var MessageDefine = require('./MessageDefine');
 
-var Task=yhnode.base.BaseObject.extend({
+var Task=BaseObject.extend({
 
     initialize:function(){
 
@@ -52,14 +54,87 @@ var Task=yhnode.base.BaseObject.extend({
     },
 
     run:function(){
+        this._hostsRunningStatus={};
         var hosts=this._hosts;
         var host;
         for(var k in hosts){
             host=hosts[k];
-            host.initAction(this._action);
-            host.execNextCommand();
+            this.runAction(host);
         }
+    },
+
+    runAction:function(host){
+        var self=this;
+        this._hostsRunningStatus[host.getName()]=false;
+
+        var onComplete=function(host,name){
+            console.log("onComplete1:",name,self._name);
+            if(self._name==name){
+                host.removeListener(MessageDefine.ExecActionComplete,onComplete);
+                self._hostsRunningStatus[host.getName()]=true;
+                self._checkTaskOnHostsComplete(host);
+            }
+        };
+
+        host.on(MessageDefine.ExecActionComplete,onComplete);
+
+        host.initAction(this._action,this._name);
+console.log(host.getName()+" isAcitve:"+host.isActive(),host.isLogin())
+        if(host.isActive()){
+            if(host.isLogin()){
+                host.execNextCommand();
+            }else{
+                host.on(MessageDefine.Login,function(){
+                    console.log("login1:")
+                    host.execNextCommand();
+                });
+            }
+        }else{
+            host.connect();
+            host.on(MessageDefine.Login,function(){
+                console.log("login2:")
+                host.execNextCommand();
+            });
+        }
+    },
+
+    _checkTaskOnHostsComplete:function(){
+
+        for(var appName in this._hostsRunningStatus){
+            if(!this._hostsRunningStatus[appName]){
+                return false;
+            }
+        }
+        console.log("_checkTaskOnHostsComplete:true");
+        this.emit(MessageDefine.TaskComplete);
+        return true;
+    },
+
+    continueRunActionOnHost:function(host){
+        console.log("continueRunActionOnHost:"+this._name);
+        var self=this;
+
+        host.save();
+
+        host.initAction(this._action,this._name);
+
+        console.log("after initAction:"+host._actionName);
+
+        var onComplete=function(host,name){
+            console.log("onComplete2:",name,self._name);
+            if(self._name==name){
+                host.removeListener(MessageDefine.ExecActionComplete,onComplete);
+                host.restore();
+                host.execNextCommand();
+            }
+        };
+
+        host.on(MessageDefine.ExecActionComplete,onComplete);
+
+        host.execNextCommand();
+
     }
+
 },null,yhnode.base.Accessor);
 
 module.exports=Task;

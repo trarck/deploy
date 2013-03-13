@@ -1,3 +1,4 @@
+var yhnode=require('yhnode');
 var BaseObject = require('./BaseObject');
 var Connection = require('./ConnectionGateway');
 var MessageDefine = require('./MessageDefine');
@@ -9,7 +10,7 @@ var Host = BaseObject.extend({
     initialize:function () {
         this._commandIndex = 0;
         this._waitForActionComplete = true;
-        this._checkDelay = 1000;
+        this._checkDelay = 500;
         this._logined = false;
         this._name = null;
     },
@@ -40,14 +41,11 @@ var Host = BaseObject.extend({
         var conn = this._conn;
 
         conn.on(MessageDefine.Login, function () {
-            console.log("login");
-            self._logined = true;
-            //run app action
-            self.execNextCommand();
+            self.onLogin();
         });
 
         if (this._waitForActionComplete) {
-            this.on(MessageDefine.ExecActionComplete, function (action) {
+            this.on(MessageDefine.ExecCommandComplete, function (action) {
                 if (self._logined) {
 //                ++self._commandIndex;
                     self.execNextCommand();
@@ -86,11 +84,12 @@ var Host = BaseObject.extend({
 
 //默认action是一个命令字符串。
     execNextCommand:function () {
-//    console.log("execNextCommand:",this._commandIndex);
-        if (this._commandIndex < this._action.length) {
-            this.execCommand(this._action[this._commandIndex]);
+//        console.log("execNextCommand["+this.getName()+"]:",this._commandIndex,this._action.length);
+        //当执行commnad的时候，this._commandIndex应该是加过1之后的。
+        var currentIndex=this._commandIndex++;
+        if (currentIndex < this._action.length) {
+            this.execCommand(this._action[currentIndex]);
         }
-        ++this._commandIndex;
     },
 
     /**
@@ -102,10 +101,14 @@ var Host = BaseObject.extend({
         command.exec(this._conn);
     },
 
-    getCommand:function (action) {
-        if (typeof action == "string") return action;
-        if (action.getCommand) return action.getCommand();
-        if (action.cmd) return action.cmd;
+    getCommand:function (command) {
+        if (typeof command == "string") return this.replacePlaceHodlders(command);
+        if (command.getExecString) return command.getExecString(this._conn);
+    },
+
+    replacePlaceHodlders:function (cmd, conn) {
+        var hodlerRegex=/#\{HOST\}/g;
+        return hodlerRegex.test(cmd)?cmd.replace(hodlerRegex, conn.getHost()):cmd;
     },
 
     /**
@@ -116,27 +119,41 @@ var Host = BaseObject.extend({
         if (this._checkTimer) clearTimeout(this._checkTimer);
         this._checkTimer = setTimeout(function () {
             self.checkActionFinish();
-            //由于在checkActionFinish中触发了ExecActionComplete事件，会引起执行下个动作，所以先检查ExecAllComplete事件。
+            //由于在checkActionFinish中触发了ExecCommandComplete事件，会引起执行下个动作，所以先检查ExecActionComplete事件。
             self.checkCommandFinish();
         }, this._checkDelay);
     },
 
     checkCommandFinish:function () {
-        this.emit(MessageDefine.ExecActionComplete, this._action[this._commandIndex]);
+        this.emit(MessageDefine.ExecCommandComplete, this._action[this._commandIndex]);
     },
 
     checkActionFinish:function () {
-//    console.log("this._commandIndex>=this._action.length",this._commandIndex,this._action.length);
+    console.log("checkActionFinish:",this._commandIndex,this._action.length,this._actionName);
         if (this._commandIndex >= this._action.length) {
-            console.log(this._conn.host + " :ExecAllComplete");
-            this.emit(MessageDefine.ExecAllComplete, this);
+            console.log(this._conn.host + " :ExecActionComplete");
+            this.emit(MessageDefine.ExecActionComplete, this,this._actionName);
         }
     },
 
-    initAction:function (actions) {
-        this._action = actions;
+    /**
+     * action name == task name
+     * @param actions
+     * @param actionName
+     */
+    initAction:function (actions,actionName) {
+        this._action = yhnode.base.Core.clone(actions);
         this._commandIndex = 0;
+        this._actionName=actionName;
         return this;
+    },
+
+    onLogin:function(){
+        console.log("login");
+        this._logined = true;
+        this.emit(MessageDefine.Login,this);
+        //run app action
+//        this.execNextCommand();
     },
 
     getType:function () {
@@ -150,6 +167,14 @@ var Host = BaseObject.extend({
     setAction:function (action) {
         this._action = action;
         return this;
+    },
+
+    setActionName:function(actionName) {
+        this._actionName = actionName;
+        return this;
+    },
+    getActionName:function() {
+        return this._actionName;
     },
 
     setCommandIndex:function (commandIndex) {
@@ -177,6 +202,18 @@ var Host = BaseObject.extend({
 
     getName:function() {
         return this._name||(this._conn && this._conn.getHost());
+    },
+
+    isLogin:function(){
+        return this._logined;
+    },
+
+    isIdle:function(){
+        return this._action==null || this._commandIndex>=this._action.length;
+    },
+
+    isActive:function () {
+        return this._conn && this._conn.isConnected();
     }
 
 });

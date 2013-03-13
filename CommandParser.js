@@ -38,6 +38,7 @@ exports.parseCommand=function(cmd,context,options){
                     if(!task)
                         throw new Error("dependence task["+cmd.name+"] is not defined");
                     conf.task=task;
+                    conf.hosts=
                     ret.push(new Command.CommandTask(conf));
                     break;
                 case CommandType.Sudo:

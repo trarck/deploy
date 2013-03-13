@@ -3,10 +3,10 @@ module.exports={
     Logout:'logout',
     GatewayLogin:"gatewayLogin",
     Data:"data",
-    ExecAllComplete:"execAllComplete",
     ExecActionComplete:"execActionComplete",
+    ExecCommandComplete:"execCommandComplete",
     Drain:"drain",
     CommandIdle:'commandIdle',
-    TaskONRunningHostsComplete:"taskONRunningHostsComplete",
+    TaskComplete:"taskComplete",
     Error:"error"
 };

@@ -169,8 +169,8 @@ Command.CommandJavaScript = yhnode.base.Core.Class(Command, {
 
 Command.CommandTask = yhnode.base.Core.Class(Command, {
 
-    exec:function (connection) {
-        this._config.task.run(connection);
+    exec:function (connection,host) {
+        this._config.task.continueRunActionOnHost(host);
     }
 });
 
