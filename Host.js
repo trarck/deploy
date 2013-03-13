@@ -84,11 +84,12 @@ var Host = BaseObject.extend({
 
 //默认action是一个命令字符串。
     execNextCommand:function () {
-//    console.log("execNextCommand:",this._commandIndex);
-        if (this._commandIndex < this._action.length) {
-            this.execCommand(this._action[this._commandIndex]);
+//        console.log("execNextCommand["+this.getName()+"]:",this._commandIndex,this._action.length);
+        //当执行commnad的时候，this._commandIndex应该是加过1之后的。
+        var currentIndex=this._commandIndex++;
+        if (currentIndex < this._action.length) {
+            this.execCommand(this._action[currentIndex]);
         }
-        ++this._commandIndex;
     },
 
     /**
