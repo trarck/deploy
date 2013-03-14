@@ -12,6 +12,15 @@ var opts = [
     },
 
     {
+<<<<<<< HEAD
+=======
+        full:'arguments',
+        short:'args',
+        description:"get args"
+    },
+
+    {
+>>>>>>> oo
         full:'help',
         type:"boolean",
         defaultValue:true,
@@ -43,14 +52,7 @@ if (options.help != null || cmds.length<2) {
 
     initLog(stageConfig.log);
 
-    var deploy=new Deploy(stageConfig);
-    deploy.initHosts();
-
-//    deploy.setTaskManager(new TaskManager());
-    deploy.initTasks();
-
-    deploy.runTasks(cmds.slice(1));
-
+    Deploy.create(stageConfig,cmds.slice(1));
 }
 
 
