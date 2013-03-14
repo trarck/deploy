@@ -56,7 +56,7 @@ var config={
             action:[
                 Command.runJSFile("./scripts/t.js"),
                 Command.run("ll"),
-                Command.run("cd #{home}"),
+                Command.run("cd #{mt}"),//parse from cmd args
                 Command.runTask("exit")
             ],
 
