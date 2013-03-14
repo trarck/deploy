@@ -4,7 +4,7 @@ var fs=require('fs');
 var path=require('path');
 var yhnode=require('yhnode');
 var Deploy=require('../lib/Deploy');
-
+var Command=require('../lib/Command');
 var opts = [
     {
         full:'configPath',
@@ -12,15 +12,12 @@ var opts = [
     },
 
     {
-<<<<<<< HEAD
-=======
         full:'arguments',
         short:'args',
         description:"get args"
     },
 
     {
->>>>>>> oo
         full:'help',
         type:"boolean",
         defaultValue:true,
@@ -28,7 +25,7 @@ var opts = [
     }
 ];
 
-var result = yhnode.base.ArgParser.parse(opts);
+var result = yhnode.base.ArgParser.parse(opts,true);
 
 var options = result.options;
 var cmds = result.cmds;
@@ -51,6 +48,8 @@ if (options.help != null || cmds.length<2) {
     var stageConfig=require(stageFile);
 
     initLog(stageConfig.log);
+
+    Command.addOptions(options);
 
     Deploy.create(stageConfig,cmds.slice(1));
 }

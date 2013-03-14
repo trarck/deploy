@@ -8,6 +8,7 @@
 var Command=require('../lib/Command');
 var CommandOut=require('../lib/CommandOut');
 
+Command.addOption("home","test");
 /**
  * action=[command,command]
  */
@@ -55,6 +56,7 @@ var config={
             action:[
                 Command.runJSFile("./scripts/t.js"),
                 Command.run("ll"),
+                Command.run("cd #{home}"),
                 Command.runTask("exit")
             ],
 
