@@ -24,7 +24,7 @@ func_start()
    fi
 
    cd $BASE_DIR
-   node0.6 ngCore/bin/ngServer server > /dev/null 2>&1 &
+   ngServer server > /dev/null 2>&1 &
    sleep 1
    echo start ngServer `cat $PIDFILE`
 }
