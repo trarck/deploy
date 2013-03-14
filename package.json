@@ -1,6 +1,6 @@
 {
     "name":"njdeploy",
-    "version":"0.0.1",
+    "version":"0.0.2",
     "author":"trarck@gmail.com",
     "main":"index.js",
     "bin": {
